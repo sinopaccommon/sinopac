@@ -2,7 +2,7 @@ SINOPAC_ROOT=/usr/AP
 SINOPAC_PATH=${SINOPAC_ROOT}/sinopac
 SINOPAC_LOG_PATH=${SINOPAC_PATH}/log
 
-PID=${ps -ef | grep java | grep sinopac | awk '{print $2}'}
+PID=$(ps -ef | grep java | grep api | awk '{print $2}')
 
 echo rebooting please wait...
 
@@ -19,7 +19,7 @@ mvn clean install
 mkdir -p ${SINOPAC_LOG_PATH}
 touch ${SINOPAC_LOG_PATH}/info.log
 
-cd ${SINOPAC_ROOT}/target
+cd ${SINOPAC_PATH}/target
 
 nohup java \
 	 -jar api.jar \
