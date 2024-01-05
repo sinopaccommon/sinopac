@@ -1,4 +1,4 @@
-package moses.test.config;
+package com.api.config;
 
 import java.util.ArrayList;
 
