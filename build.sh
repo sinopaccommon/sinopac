@@ -21,7 +21,7 @@ touch ${SINOPAC_LOG_PATH}/info.log
 
 cd ${SINOPAC_PATH}/target
 
-nohup sudo java \
+sudo nohup java \
 	 -jar api.jar \
 	 > /dev/null 2>&1 &
 	 
