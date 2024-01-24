@@ -21,7 +21,7 @@ public class SwaggerConfig {
 	public Docket api() {
 		return new Docket(DocumentationType.SWAGGER_2)
 				.select()
-				.apis(RequestHandlerSelectors.basePackage("moses.test.controller"))
+				.apis(RequestHandlerSelectors.basePackage("com.api.controller"))
 				.paths(PathSelectors.any())
 				.build()
 		.apiInfo(apiInfo());
@@ -35,7 +35,7 @@ public class SwaggerConfig {
                 null,
                 new Contact("Your Name", "Your Website", "your.email@example.com"),
                 "License",
-                "http://localhost:8080/swagger-ui/index.html#/",
+                "https://dev-sinotwpay.ocard.co/swagger-ui/index.html#/",
                 new ArrayList<>()
         );
     }
