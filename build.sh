@@ -25,4 +25,4 @@ sudo nohup java \
 	 -jar api.jar \
 	 > /dev/null 2>&1 &
 	 
-tail -f ${SINOPAC_LOG_PATH}/info.log
+#tail -f ${SINOPAC_LOG_PATH}/info.log
