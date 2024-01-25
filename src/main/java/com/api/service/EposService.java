@@ -31,9 +31,11 @@ public class EposService {
 	private static final String PAYMENT_IN_FULL = "0";
 
 	private static final String SECURITY_ID = "cd933a4c414d44de970a0c936199f479";
+	
+	private static final String DOMAIN = "54.95.68.119";
 
 	public int auth(String ocard) {
-		int rtnCode = 0;
+		int rtnCode = 666;
 
 		JSONObject obj = decryptedOcard(ocard);
 		ApiClient apiClient = new ApiClient();
@@ -49,7 +51,7 @@ public class EposService {
 		apiClient.setTransMode(PAYMENT_IN_FULL);
 		apiClient.setTransAmt(obj.optString("Amt"));
 		apiClient.setCustomerIp("54.168.161.147");
-		apiClient.setDoname("54.95.68.119");
+		apiClient.setDoname(DOMAIN);
 		apiClient.setSecurityId(SECURITY_ID);
 		apiClient.setFrontendUrl(obj.optString("ReturnURL"));
 		try {
@@ -73,7 +75,7 @@ public class EposService {
 		apiClient.setTransCode(TRANS_CODE_CANCEL);
 		apiClient.setMemberId(obj.optString("MerchantID"));
 		apiClient.setCustomerIp("54.168.161.147");
-		apiClient.setDoname("54.95.68.119");
+		apiClient.setDoname(DOMAIN);
 		apiClient.setSecurityId(SECURITY_ID);
 		try {
 			rtnCode = apiClient.post();
@@ -93,7 +95,7 @@ public class EposService {
 		apiClient.setMid(MID);
 		apiClient.setOid(obj.optString("MerchantOrderNo"));
 		apiClient.setCustomerIp("54.168.161.147");
-		apiClient.setDoname("54.95.68.119");
+		apiClient.setDoname(DOMAIN);
 		apiClient.setSecurityId(SECURITY_ID);
 		try {
 			rtnCode = apiClient.post();
