@@ -49,7 +49,7 @@ public class EposService {
 		apiClient.setTransMode(PAYMENT_IN_FULL);
 		apiClient.setTransAmt(obj.optString("Amt"));
 		apiClient.setCustomerIp("54.168.161.147");
-		apiClient.setDoname("https://eposuat.sinopac.com");
+		apiClient.setDoname("54.95.68.119");
 		apiClient.setSecurityId(SECURITY_ID);
 		apiClient.setFrontendUrl(obj.optString("ReturnURL"));
 		try {
