@@ -16,8 +16,18 @@ public class EposController {
 	EposService eposService;
 	
 	@PostMapping("/auth")
-	public ResponseEntity<Integer> auth() {
-		return ResponseEntity.ok(eposService.auth());
+	public ResponseEntity<Integer> auth(String ocard) {
+		return ResponseEntity.ok(eposService.auth(ocard));
+	}
+	
+	@PostMapping("/cancel")
+	public ResponseEntity<Integer> cancel(String ocard) {
+		return ResponseEntity.ok(eposService.cancel(ocard));
+	}
+	
+	@PostMapping("/query")
+	public ResponseEntity<Integer> query(String ocard) {
+		return ResponseEntity.ok(eposService.query(ocard));
 	}
 	
 
