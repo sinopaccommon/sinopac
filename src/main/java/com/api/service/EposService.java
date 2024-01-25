@@ -98,7 +98,7 @@ public class EposService {
 		apiClient.setDoname(DOMAIN);
 		apiClient.setSecurityId(SECURITY_ID);
 		try {
-			rtnCode = apiClient.post();
+			rtnCode = apiClient.query();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
