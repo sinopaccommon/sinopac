@@ -9,19 +9,27 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+import io.micrometer.core.instrument.util.StringUtils;
+
+@Service
 public class ToolUtil {
 	@Value("${pd.sk}")
-	private static String sourceKey;
+	private String sourceKey;
 
 	@Value("${pd.iv}")
-	private static String iv;
+	private String iv;
 
-	public static String decrypt(String ocard) {
+	public String decrypt(String ocard) {
 		return decrypt(sourceKey, iv, ocard);
 	}
+	
+	public String encrypt(String ocard) {
+		return encrypt(sourceKey, iv, ocard);
+	}
 
-	private static String decrypt(String key, String initVector, String encryptedData) {
+	private String decrypt(String key, String initVector, String encryptedData) {
 		try {
 			byte[] keyBytes = base64Decode(key).getBytes("UTF-8");
 			byte[] ivBytes = base64Decode(initVector).getBytes("UTF-8");
@@ -43,9 +51,56 @@ public class ToolUtil {
 		}
 		return null;
 	}
+
+	public String encrypt(String key, String initVector, String data) {
+		try {
+			byte[] keyBytes = base64Decode(key).getBytes("UTF-8");
+			byte[] ivBytes = base64Decode(initVector).getBytes("UTF-8");
+			keyBytes = MessageDigest.getInstance("SHA-256").digest(keyBytes);
+			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+			SecretKeySpec secretKey = new SecretKeySpec(keyBytes, "AES");
+			IvParameterSpec ivParameterSpec = new IvParameterSpec(ivBytes);
+
+			cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivParameterSpec);
+
+			byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+			return Base64.getEncoder().encodeToString(encryptedBytes);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private String base64Decode(String encodedString) {
+		byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
+		return new String(decodedBytes);
+	}
 	
-	private static String base64Decode(String encodedString) {
-        byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
-        return new String(decodedBytes);
+	public String maskSubstring(String input, int startIndex, int endIndex) {
+		if(StringUtils.isBlank(input)) {
+			return "";
+		}
+		
+        // 確保startIndex和endIndex在有效範圍內
+        if (startIndex < 0) {
+            startIndex = 0;
+        }
+        if (endIndex > input.length()) {
+            endIndex = input.length();
+        }
+
+        // 使用StringBuilder替換需要解碼的部分
+        StringBuilder unmaskedStringBuilder = new StringBuilder(input);
+        unmaskedStringBuilder.replace(startIndex, endIndex, generateStars(endIndex - startIndex));
+
+        return unmaskedStringBuilder.toString();
+    }
+
+    private String generateStars(int count) {
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            stars.append('*');
+        }
+        return stars.toString();
     }
 }

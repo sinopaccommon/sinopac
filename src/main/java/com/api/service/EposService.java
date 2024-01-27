@@ -3,6 +3,7 @@ package com.api.service;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.api.util.ToolUtil;
@@ -16,6 +17,8 @@ public class EposService {
 	private static final String KEY_OID = "MerchantOrderNo";
 
 	private static final String KEY_MEMBER_ID = "MerchantID";
+
+	private static final String KEY_PAN = "CardNo";
 
 	private static final String KEY_TRANSAMT = "Amt";
 
@@ -37,10 +40,19 @@ public class EposService {
 
 	private static final String DOMAIN = "54.95.68.119";
 
-	public JSONObject auth(String ocard) {
+	@Autowired
+	private ToolUtil toolUtil;
+
+	public String auth(String ocard) {
+		log.info("auth start...");
+
+		JSONObject obj = parseOcard(ocard);
 		JSONObject result = new JSONObject();
+		result.put("Oid", obj.optString(KEY_OID));
+		log.info("auth [MerchantOrderNo]: " + obj.optString(KEY_OID) + ", [CardNo]: "
+				+ toolUtil.maskSubstring(obj.optString(KEY_PAN), 9, 15) + ", [Amt]: " + obj.optString(KEY_TRANSAMT));
+
 		int rtnCode = 0;
-		JSONObject obj = decryptedOcard(ocard);
 		ApiClient apiClient = new ApiClient();
 		apiClient.clear();
 		apiClient.setMid(MID);
@@ -62,8 +74,29 @@ public class EposService {
 			log.info("auth rtnCode: " + rtnCode);
 			if (rtnCode > 0) {
 				if (rtnCode == 1) {
+					result.put("html", apiClient.getHtml());
 				} else if (rtnCode == 2) {
-
+					result.put("TransDate", apiClient.getTransDate());
+					result.put("TransTime", apiClient.getTransTime());
+					result.put("TransCode", apiClient.getTransCode());
+					result.put("TransMode", apiClient.getTransMode());
+					result.put("TransAmt", apiClient.getTransAmt());
+					result.put("ApproveCode", apiClient.getApproveCode());
+					result.put("ResponseCode", apiClient.getResponseCode());
+					result.put("ResponseMsg", apiClient.getResponseMsg());
+					result.put("RequestDate", apiClient.getRequestDate());
+					result.put("RequestAmt", apiClient.getRequestAmt());
+					result.put("Execute", apiClient.getExecute());
+					result.put("InstallmentType", apiClient.getInstallmentType());
+					result.put("FirstAmt", apiClient.getFirstAmt());
+					result.put("EachAmt", apiClient.getEachAmt());
+					result.put("Fee", apiClient.getFee());
+					result.put("RedeemType", apiClient.getRedeemType());
+					result.put("RedeemUsed", apiClient.getRedeemUsed());
+					result.put("RedeemBalance", apiClient.getRedeemBalance());
+					result.put("CreditAmt", apiClient.getCreditAmt());
+					result.put("OnusFlag", apiClient.getOnusFlag());
+					result.put("SecureStatus", apiClient.getSecureStatus());
 				}
 			} else {
 				result.put("errMsg", "Auth Fail");
@@ -74,13 +107,20 @@ public class EposService {
 			result.put("errMsg", ex.getMessage());
 		}
 
+		log.info("auth end...");
+
 		result.put("code", rtnCode);
-		return result;
+		return toolUtil.encrypt(result.toString());
 	}
 
-	public JSONObject cancel(String ocard) {
+	public String cancel(String ocard) {
+		log.info("cancel start...");
+
+		JSONObject obj = parseOcard(ocard);
 		JSONObject result = new JSONObject();
-		JSONObject obj = decryptedOcard(ocard);
+		result.put("Oid", obj.optString(KEY_OID));
+		log.info("cancel [MerchantOrderNo]: " + obj.optString(KEY_OID));
+
 		int rtnCode = 0;
 		ApiClient apiClient = new ApiClient();
 		apiClient.clear();
@@ -96,8 +136,29 @@ public class EposService {
 			rtnCode = apiClient.post();
 			if (rtnCode > 0) {
 				if (rtnCode == 1) {
+					result.put("html", apiClient.getHtml());
 				} else if (rtnCode == 2) {
-
+					result.put("TransDate", apiClient.getTransDate());
+					result.put("TransTime", apiClient.getTransTime());
+					result.put("TransCode", apiClient.getTransCode());
+					result.put("TransMode", apiClient.getTransMode());
+					result.put("TransAmt", apiClient.getTransAmt());
+					result.put("ApproveCode", apiClient.getApproveCode());
+					result.put("ResponseCode", apiClient.getResponseCode());
+					result.put("ResponseMsg", apiClient.getResponseMsg());
+					result.put("RequestDate", apiClient.getRequestDate());
+					result.put("RequestAmt", apiClient.getRequestAmt());
+					result.put("Execute", apiClient.getExecute());
+					result.put("InstallmentType", apiClient.getInstallmentType());
+					result.put("FirstAmt", apiClient.getFirstAmt());
+					result.put("EachAmt", apiClient.getEachAmt());
+					result.put("Fee", apiClient.getFee());
+					result.put("RedeemType", apiClient.getRedeemType());
+					result.put("RedeemUsed", apiClient.getRedeemUsed());
+					result.put("RedeemBalance", apiClient.getRedeemBalance());
+					result.put("CreditAmt", apiClient.getCreditAmt());
+					result.put("OnusFlag", apiClient.getOnusFlag());
+					result.put("SecureStatus", apiClient.getSecureStatus());
 				}
 			} else {
 				result.put("errMsg", "Cancel Fail");
@@ -109,13 +170,20 @@ public class EposService {
 		}
 
 		result.put("code", rtnCode);
-		return result;
+
+		log.info("cancel end...");
+		return toolUtil.encrypt(result.toString());
 	}
 
-	public JSONObject query(String ocard) {
+	public String query(String ocard) {
+		log.info("query start...");
+
+		JSONObject obj = parseOcard(ocard);
 		JSONObject result = new JSONObject();
+		result.put("Oid", obj.optString(KEY_OID));
+		log.info("query [MerchantOrderNo]: " + obj.optString(KEY_OID));
+
 		int rtnCode = 0;
-		JSONObject obj = decryptedOcard(ocard);
 		ApiClient apiClient = new ApiClient();
 		apiClient.clear();
 		apiClient.setMid(MID);
@@ -127,8 +195,29 @@ public class EposService {
 			rtnCode = apiClient.query();
 			if (rtnCode > 0) {
 				if (rtnCode == 1) {
+					result.put("html", apiClient.getHtml());
 				} else if (rtnCode == 2) {
-
+					result.put("TransDate", apiClient.getTransDate());
+					result.put("TransTime", apiClient.getTransTime());
+					result.put("TransCode", apiClient.getTransCode());
+					result.put("TransMode", apiClient.getTransMode());
+					result.put("TransAmt", apiClient.getTransAmt());
+					result.put("ApproveCode", apiClient.getApproveCode());
+					result.put("ResponseCode", apiClient.getResponseCode());
+					result.put("ResponseMsg", apiClient.getResponseMsg());
+					result.put("RequestDate", apiClient.getRequestDate());
+					result.put("RequestAmt", apiClient.getRequestAmt());
+					result.put("Execute", apiClient.getExecute());
+					result.put("InstallmentType", apiClient.getInstallmentType());
+					result.put("FirstAmt", apiClient.getFirstAmt());
+					result.put("EachAmt", apiClient.getEachAmt());
+					result.put("Fee", apiClient.getFee());
+					result.put("RedeemType", apiClient.getRedeemType());
+					result.put("RedeemUsed", apiClient.getRedeemUsed());
+					result.put("RedeemBalance", apiClient.getRedeemBalance());
+					result.put("CreditAmt", apiClient.getCreditAmt());
+					result.put("OnusFlag", apiClient.getOnusFlag());
+					result.put("SecureStatus", apiClient.getSecureStatus());
 				}
 			} else {
 				result.put("errMsg", "Query Fail");
@@ -140,12 +229,13 @@ public class EposService {
 		}
 
 		result.put("code", rtnCode);
-		return result;
+		log.info("query end...");
+		return toolUtil.encrypt(result.toString());
 	}
 
-	private JSONObject decryptedOcard(String ocard) {
-		String decryptedData = ToolUtil.decrypt(ocard);
+	private JSONObject parseOcard(String ocard) {
+		String decryptedData = toolUtil.decrypt(ocard);
 		return new JSONObject(decryptedData);
 	}
-	
+
 }
