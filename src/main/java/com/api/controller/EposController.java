@@ -1,5 +1,6 @@
 package com.api.controller;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,17 +17,17 @@ public class EposController {
 	EposService eposService;
 	
 	@PostMapping("/auth")
-	public ResponseEntity<Integer> auth(String ocard) {
+	public ResponseEntity<JSONObject> auth(String ocard) {
 		return ResponseEntity.ok(eposService.auth(ocard));
 	}
 	
 	@PostMapping("/cancel")
-	public ResponseEntity<Integer> cancel(String ocard) {
+	public ResponseEntity<JSONObject> cancel(String ocard) {
 		return ResponseEntity.ok(eposService.cancel(ocard));
 	}
 	
 	@PostMapping("/query")
-	public ResponseEntity<Integer> query(String ocard) {
+	public ResponseEntity<JSONObject> query(String ocard) {
 		return ResponseEntity.ok(eposService.query(ocard));
 	}
 	
