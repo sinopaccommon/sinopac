@@ -1,6 +1,6 @@
 SINOPAC_ROOT=/usr/AP
 SINOPAC_PATH=${SINOPAC_ROOT}/sinopac
-SINOPAC_LOG_PATH=${SINOPAC_PATH}/log
+SINOPAC_LOG_PATH=${SINOPAC_PATH}/logs
 
 PID=$(ps -ef | grep java | grep api | awk '{print $2}')
 
