@@ -55,7 +55,10 @@ public class EposService {
 		apiClient.setSecurityId(SECURITY_ID);
 		apiClient.setFrontendUrl(obj.optString("ReturnURL"));
 		try {
-			log.info("auth apiClient: " + apiClient.toString());
+			log.info("auth apiClient.getOid: " + apiClient.getOid());
+			log.info("auth apiClient.getMemberId: " + apiClient.getMemberId());
+			log.info("auth apiClient.getTransAmt: " + apiClient.getTransAmt());
+			log.info("auth apiClient.getFrontendUrl: " + apiClient.getFrontendUrl());
 			rtnCode = apiClient.post();
 			
 			log.info("auth result obj: " + apiClient.toString());
