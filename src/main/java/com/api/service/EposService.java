@@ -55,6 +55,7 @@ public class EposService {
 		apiClient.setSecurityId(SECURITY_ID);
 		apiClient.setFrontendUrl(obj.optString("ReturnURL"));
 		try {
+			log.info("auth apiClient: " + apiClient.toString());
 			rtnCode = apiClient.post();
 			
 			log.info("auth result obj: " + apiClient.toString());
