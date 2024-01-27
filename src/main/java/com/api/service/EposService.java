@@ -1,10 +1,6 @@
 package com.api.service;
 
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
@@ -13,6 +9,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.dxc.epos.api.ApiClient;
@@ -20,6 +18,8 @@ import com.dxc.epos.api.ApiClient;
 @Service
 public class EposService {
 
+	private static final Logger log = LoggerFactory.getLogger(EposService.class);
+	
 	private static final String MID = "807426550588001";
 
 	private static final String TID = "80019423";
@@ -35,7 +35,7 @@ public class EposService {
 	private static final String DOMAIN = "54.95.68.119";
 
 	public int auth(String ocard) {
-		int rtnCode = 666;
+		int rtnCode = 0;
 
 		JSONObject obj = decryptedOcard(ocard);
 		ApiClient apiClient = new ApiClient();
@@ -56,8 +56,10 @@ public class EposService {
 		apiClient.setFrontendUrl(obj.optString("ReturnURL"));
 		try {
 			rtnCode = apiClient.post();
+			
+			log.info("auth result obj: " + apiClient.toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("auth error: " + ex.getMessage(), ex);
 		}
 
 		return rtnCode;
@@ -79,8 +81,10 @@ public class EposService {
 		apiClient.setSecurityId(SECURITY_ID);
 		try {
 			rtnCode = apiClient.post();
+			
+			log.info("cancel result obj: " + apiClient.toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("cancel error: " + ex.getMessage(), ex);
 		}
 
 		return rtnCode;
@@ -99,8 +103,10 @@ public class EposService {
 		apiClient.setSecurityId(SECURITY_ID);
 		try {
 			rtnCode = apiClient.query();
+			
+			log.info("query result obj: " + apiClient.toString());
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error("query error: " + ex.getMessage(), ex);
 		}
 
 		return rtnCode;
@@ -109,68 +115,30 @@ public class EposService {
 	private JSONObject decryptedOcard(String ocard) {
 		String sourceKey = "Ocard_Sinopac";
 		String iv = "QWq2vaaB@juvTYNh";
-		String sha256Hash = calculateSHA256(sourceKey);
-		String md5Hash = calculateMD5(iv);
-		String decryptedData = decrypt(sha256Hash, md5Hash.substring(0,16), ocard);
+		String decryptedData = decrypt(sourceKey, iv, ocard);
 		return new JSONObject(decryptedData);
 	}
 
-	private String calculateSHA256(String input) {
-		try {
-			MessageDigest mDigest = MessageDigest.getInstance("SHA-256");
-			byte[] shaByteArr = mDigest.digest(input.getBytes(StandardCharsets.UTF_8));
-
-			// 將字節轉換為十六進制字符串
-			StringBuilder hexStrBuilder = new StringBuilder();
-			for (byte b : shaByteArr) {
-				hexStrBuilder.append(String.format("%02X", b));
-	        }
-			return hexStrBuilder.toString();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private String calculateMD5(String input) {
-		try {
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] messageDigest = md.digest(input.getBytes());
-
-			// 轉換為16進制字符串
-			BigInteger no = new BigInteger(1, messageDigest);
-			StringBuilder hashText = new StringBuilder(no.toString(16));
-			for (int i = 0; i < messageDigest.length; i++) {
-				hashText.append(Integer.toHexString(0xFF & messageDigest[i]));
-			}
-			return hashText.toString();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
 	private String decrypt(String key, String initVector, String encryptedData) {
-		try {
-			byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
-			byte[] ivBytes = initVector.getBytes(StandardCharsets.UTF_8);
+        try {
+            byte[] keyBytes = key.getBytes("UTF-8");
+            byte[] ivBytes = initVector.getBytes("UTF-8");
 
-			// 確保 key 長度是 32 字節 (256 位)
-			keyBytes = Arrays.copyOf(keyBytes, 32);
+            // 確保 key 長度是 32 字節 (256 位)
+            keyBytes = MessageDigest.getInstance("SHA-256").digest(keyBytes);
 
-			SecretKey secretKey = new SecretKeySpec(keyBytes, "AES");
-			Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
-			cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(ivBytes));
+            SecretKey secretKey = new SecretKeySpec(keyBytes, "AES");
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(ivBytes));
 
-			// 將 Base64 編碼的數據解碼並解密
-			byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
-			byte[] decryptedBytes = cipher.doFinal(decodedBytes);
+            // 將 Base64 編碼的數據解碼並進行解密
+            byte[] decodedBytes = Base64.getDecoder().decode(encryptedData);
+            byte[] decryptedBytes = cipher.doFinal(decodedBytes);
 
-			// 將解密後的數據轉換為字符串
-			return new String(decryptedBytes, StandardCharsets.UTF_8);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
+            return new String(decryptedBytes, "UTF-8");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
