@@ -18,7 +18,13 @@ public class EposService {
 
 	private static final String KEY_MEMBER_ID = "MerchantID";
 
-	private static final String KEY_PAN = "CardNo";
+	private static final String KEY_CARD = "card";
+
+	private static final String KEY_PAN = "card_no";
+
+	private static final String KEY_EXPIRE_DATE = "expired_date";
+
+	private static final String KEY_CVV2 = "cvc";
 
 	private static final String KEY_TRANSAMT = "Amt";
 
@@ -38,7 +44,7 @@ public class EposService {
 
 	private static final String CUSTOMER_IP = "https://dev-sinotwpay.ocard.co/";
 
-	private static final String DOMAIN = "54.95.68.119";
+	private static final String DOMAIN = "eposuat.sinopac.com";
 
 	@Autowired
 	private ToolUtil toolUtil;
@@ -49,27 +55,35 @@ public class EposService {
 		JSONObject obj = parseOcard(ocard);
 		JSONObject result = new JSONObject();
 		result.put("Oid", obj.optString(KEY_OID));
-		log.info("auth [MerchantOrderNo]: " + obj.optString(KEY_OID) + ", [CardNo]: "
-				+ toolUtil.maskSubstring(obj.optString(KEY_PAN), 9, 15) + ", [Amt]: " + obj.optString(KEY_TRANSAMT));
 
 		int rtnCode = 0;
-		ApiClient apiClient = new ApiClient();
-		apiClient.clear();
-		apiClient.setMid(MID);
-		apiClient.setTid(TID);
-		apiClient.setOid(obj.optString(KEY_OID));
-		apiClient.setTransCode(TRANS_CODE_AUTH);
-		apiClient.setMemberId(obj.optString(KEY_MEMBER_ID));
-		apiClient.setPan("4058650000000013"); // TODO 卡號
-		apiClient.setExpireDate("1912"); // TODO 到期日
-		apiClient.setCvv2("000"); // 後三碼
-		apiClient.setTransMode(PAYMENT_IN_FULL);
-		apiClient.setTransAmt(obj.optString(KEY_TRANSAMT));
-		apiClient.setCustomerIp(CUSTOMER_IP);
-		apiClient.setDoname(DOMAIN);
-		apiClient.setSecurityId(SECURITY_ID);
-		apiClient.setFrontendUrl(obj.optString(KEY_FRONTEND_URL));
 		try {
+			JSONObject cardObj = obj.optJSONObject(KEY_CARD);
+			if (cardObj == null) {
+				throw new Exception("auth can not find card");
+			}
+
+			log.info("auth [MerchantOrderNo]: " + obj.optString(KEY_OID) + ", [CardNo]: "
+					+ toolUtil.maskSubstring(cardObj.optString(KEY_PAN), 9, 15) + ", [Amt]: "
+					+ obj.optString(KEY_TRANSAMT));
+
+			ApiClient apiClient = new ApiClient();
+			apiClient.clear();
+			apiClient.setMid(MID);
+			apiClient.setTid(TID);
+			apiClient.setOid(obj.optString(KEY_OID));
+			apiClient.setTransCode(TRANS_CODE_AUTH);
+			apiClient.setMemberId(obj.optString(KEY_MEMBER_ID));
+			apiClient.setPan(cardObj.optString(KEY_PAN)); // 卡號
+			apiClient.setExpireDate(cardObj.optString(KEY_EXPIRE_DATE)); // 到期日
+			apiClient.setCvv2(cardObj.optString(KEY_CVV2)); // 後三碼
+			apiClient.setTransMode(PAYMENT_IN_FULL);
+			apiClient.setTransAmt(obj.optString(KEY_TRANSAMT));
+			apiClient.setCustomerIp(CUSTOMER_IP);
+			apiClient.setDoname(DOMAIN);
+			apiClient.setSecurityId(SECURITY_ID);
+			apiClient.setFrontendUrl(obj.optString(KEY_FRONTEND_URL));
+
 			rtnCode = apiClient.post();
 			log.info("auth rtnCode: " + rtnCode);
 			if (rtnCode > 0) {
