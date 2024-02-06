@@ -9,38 +9,38 @@ import org.springframework.stereotype.Service;
 import com.api.util.ToolUtil;
 import com.dxc.epos.api.ApiClient;
 
+import io.micrometer.core.instrument.util.StringUtils;
+
 @Service
 public class EposService {
 
 	private static final Logger log = LoggerFactory.getLogger(EposService.class);
 
-	private static final String KEY_OID = "MerchantOrderNo";
+	private static final String KEY_MID = "Mid";
 
-	private static final String KEY_MEMBER_ID = "MerchantID";
+	private static final String KEY_TID = "Tid";
 
-	private static final String KEY_CARD = "card";
+	private static final String KEY_OID = "Oid";
 
-	private static final String KEY_PAN = "card_no";
+	private static final String KEY_MEMBER_ID = "MemberId";
 
-	private static final String KEY_EXPIRE_DATE = "expired_date";
+	private static final String KEY_PAN = "Pan";
 
-	private static final String KEY_CVV2 = "cvc";
+	private static final String KEY_EXPIRE_DATE = "ExpireDate";
 
-	private static final String KEY_TRANSAMT = "Amt";
+	private static final String KEY_CVV2 = "Cvv2";
 
-	private static final String KEY_FRONTEND_URL = "ReturnURL";
+	private static final String KEY_TRANSAMT = "TransAmt";
 
-	private static final String MID = "807426550588001";
+	private static final String KEY_SECURITY_ID = "SecurityId";
 
-	private static final String TID = "80019423";
+	private static final String KEY_FRONTEND_URL = "FrontendUrl";
 
 	private static final String TRANS_CODE_AUTH = "00";
 
 	private static final String TRANS_CODE_CANCEL = "01";
 
 	private static final String PAYMENT_IN_FULL = "0";
-
-	private static final String SECURITY_ID = "cd933a4c414d44de970a0c936199f479";
 
 	private static final String CUSTOMER_IP = "https://dev-sinotwpay.ocard.co/";
 
@@ -58,30 +58,29 @@ public class EposService {
 
 		int rtnCode = 0;
 		try {
-			JSONObject cardObj = obj.optJSONObject(KEY_CARD);
-			if (cardObj == null) {
+			if (StringUtils.isBlank(obj.optString(KEY_PAN))) {
 				throw new Exception("auth can not find card");
 			}
 
-			log.info("auth [MerchantOrderNo]: " + obj.optString(KEY_OID) + ", [CardNo]: "
-					+ toolUtil.maskSubstring(cardObj.optString(KEY_PAN), 9, 15) + ", [Amt]: "
+			log.info("auth [Oid]: " + obj.optString(KEY_OID) + ", [Pan]: "
+					+ toolUtil.maskSubstring(obj.optString(KEY_PAN), 9, 15) + ", [TransAmt]: "
 					+ obj.optString(KEY_TRANSAMT));
 
 			ApiClient apiClient = new ApiClient();
 			apiClient.clear();
-			apiClient.setMid(MID);
-			apiClient.setTid(TID);
+			apiClient.setMid(obj.optString(KEY_MID));
+			apiClient.setTid(obj.optString(KEY_TID));
 			apiClient.setOid(obj.optString(KEY_OID));
 			apiClient.setTransCode(TRANS_CODE_AUTH);
 			apiClient.setMemberId(obj.optString(KEY_MEMBER_ID));
-			apiClient.setPan(cardObj.optString(KEY_PAN)); // 卡號
-			apiClient.setExpireDate(cardObj.optString(KEY_EXPIRE_DATE)); // 到期日
-			apiClient.setCvv2(cardObj.optString(KEY_CVV2)); // 後三碼
+			apiClient.setPan(obj.optString(KEY_PAN)); // 卡號
+			apiClient.setExpireDate(obj.optString(KEY_EXPIRE_DATE)); // 到期日
+			apiClient.setCvv2(obj.optString(KEY_CVV2)); // 後三碼
 			apiClient.setTransMode(PAYMENT_IN_FULL);
 			apiClient.setTransAmt(obj.optString(KEY_TRANSAMT));
 			apiClient.setCustomerIp(CUSTOMER_IP);
 			apiClient.setDoname(DOMAIN);
-			apiClient.setSecurityId(SECURITY_ID);
+			apiClient.setSecurityId(obj.optString(KEY_SECURITY_ID));
 			apiClient.setFrontendUrl(obj.optString(KEY_FRONTEND_URL));
 
 			rtnCode = apiClient.post();
@@ -133,19 +132,19 @@ public class EposService {
 		JSONObject obj = parseOcard(ocard);
 		JSONObject result = new JSONObject();
 		result.put("Oid", obj.optString(KEY_OID));
-		log.info("cancel [MerchantOrderNo]: " + obj.optString(KEY_OID));
+		log.info("cancel [Oid]: " + obj.optString(KEY_OID));
 
 		int rtnCode = 0;
 		ApiClient apiClient = new ApiClient();
 		apiClient.clear();
-		apiClient.setMid(MID);
-		apiClient.setTid(TID);
+		apiClient.setMid(obj.optString(KEY_MID));
+		apiClient.setTid(obj.optString(KEY_TID));
 		apiClient.setOid(obj.optString(KEY_OID));
 		apiClient.setTransCode(TRANS_CODE_CANCEL);
 		apiClient.setMemberId(obj.optString(KEY_MEMBER_ID));
 		apiClient.setCustomerIp(CUSTOMER_IP);
 		apiClient.setDoname(DOMAIN);
-		apiClient.setSecurityId(SECURITY_ID);
+		apiClient.setSecurityId(obj.optString(KEY_SECURITY_ID));
 		try {
 			rtnCode = apiClient.post();
 			if (rtnCode > 0) {
@@ -195,16 +194,16 @@ public class EposService {
 		JSONObject obj = parseOcard(ocard);
 		JSONObject result = new JSONObject();
 		result.put("Oid", obj.optString(KEY_OID));
-		log.info("query [MerchantOrderNo]: " + obj.optString(KEY_OID));
+		log.info("query [Oid]: " + obj.optString(KEY_OID));
 
 		int rtnCode = 0;
 		ApiClient apiClient = new ApiClient();
 		apiClient.clear();
-		apiClient.setMid(MID);
+		apiClient.setMid(obj.optString(KEY_MID));
 		apiClient.setOid(obj.optString(KEY_OID));
 		apiClient.setCustomerIp(CUSTOMER_IP);
 		apiClient.setDoname(DOMAIN);
-		apiClient.setSecurityId(SECURITY_ID);
+		apiClient.setSecurityId(obj.optString(KEY_SECURITY_ID));
 		try {
 			rtnCode = apiClient.query();
 			if (rtnCode > 0) {
