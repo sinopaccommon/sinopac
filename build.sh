@@ -17,7 +17,7 @@ touch nohup.out
 mvn clean install
 
 mkdir -p ${SINOPAC_LOG_PATH}
-touch ${SINOPAC_LOG_PATH}/info.log
+sudo touch ${SINOPAC_LOG_PATH}/info.log
 
 cd ${SINOPAC_PATH}/target
 
