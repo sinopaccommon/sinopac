@@ -20,10 +20,6 @@ public class EposService {
 
 	private static final String PAYMENT_IN_FULL = "0";
 
-	private static final String CUSTOMER_IP = "https://dev-sinotwpay.ocard.co/";
-
-	private static final String DOMAIN = "eposuat.sinopac.com";
-
 	@Autowired
 	private ToolUtil toolUtil;
 
@@ -56,8 +52,8 @@ public class EposService {
 			apiClient.setCvv2(obj.optString(JsonKey.CVV2)); // 後三碼
 			apiClient.setTransMode(PAYMENT_IN_FULL);
 			apiClient.setTransAmt(obj.optString(JsonKey.TRANS_AMT));
-			apiClient.setCustomerIp(CUSTOMER_IP);
-			apiClient.setDoname(DOMAIN);
+			apiClient.setCustomerIp(toolUtil.getCustomerIp());
+			apiClient.setDoname(toolUtil.getDomain());
 			apiClient.setSecurityId(obj.optString(JsonKey.SECURITY_ID));
 			apiClient.setFrontendUrl(obj.optString(JsonKey.FRONTEND_URL));
 
@@ -120,8 +116,8 @@ public class EposService {
 		apiClient.setOid(obj.optString(JsonKey.OID));
 		apiClient.setTransCode(TransCode.CANCEL);
 		apiClient.setMemberId(obj.optString(JsonKey.MEMBER_ID));
-		apiClient.setCustomerIp(CUSTOMER_IP);
-		apiClient.setDoname(DOMAIN);
+		apiClient.setCustomerIp(toolUtil.getCustomerIp());
+		apiClient.setDoname(toolUtil.getDomain());
 		apiClient.setSecurityId(obj.optString(JsonKey.SECURITY_ID));
 		try {
 			rtnCode = apiClient.post();
@@ -179,8 +175,8 @@ public class EposService {
 		apiClient.clear();
 		apiClient.setMid(obj.optString(JsonKey.MID));
 		apiClient.setOid(obj.optString(JsonKey.OID));
-		apiClient.setCustomerIp(CUSTOMER_IP);
-		apiClient.setDoname(DOMAIN);
+		apiClient.setCustomerIp(toolUtil.getCustomerIp());
+		apiClient.setDoname(toolUtil.getDomain());
 		apiClient.setSecurityId(obj.optString(JsonKey.SECURITY_ID));
 		try {
 			rtnCode = apiClient.query();
@@ -245,8 +241,8 @@ public class EposService {
 			apiClient.setTransAmt(obj.optString(JsonKey.TRANS_AMT));
 			apiClient.setApproveCode(obj.optString(JsonKey.APPROVE_CODE));
 			apiClient.setSecurityId(obj.optString(JsonKey.SECURITY_ID));
-			apiClient.setCustomerIp(CUSTOMER_IP);
-			apiClient.setDoname(DOMAIN);
+			apiClient.setCustomerIp(toolUtil.getCustomerIp());
+			apiClient.setDoname(toolUtil.getDomain());
 
 			rtnCode = apiClient.post();
 			log.info("capture rtnCode: " + rtnCode);
@@ -318,8 +314,8 @@ public class EposService {
 			apiClient.setTransAmt(obj.optString(JsonKey.TRANS_AMT));
 			apiClient.setApproveCode(obj.optString(JsonKey.APPROVE_CODE));
 			apiClient.setSecurityId(obj.optString(JsonKey.SECURITY_ID));
-			apiClient.setCustomerIp(CUSTOMER_IP);
-			apiClient.setDoname(DOMAIN);
+			apiClient.setCustomerIp(toolUtil.getCustomerIp());
+			apiClient.setDoname(toolUtil.getDomain());
 
 			rtnCode = apiClient.post();
 			log.info("refund rtnCode: " + rtnCode);

@@ -21,10 +21,16 @@ public class ToolUtil {
 	@Value("${pd.iv}")
 	private String iv;
 
+	@Value("${api.domain}")
+	private String domain;
+	
+	@Value("${api.customer}")
+	private String customerIp;
+
 	public String decrypt(String ocard) {
 		return decrypt(sourceKey, iv, ocard);
 	}
-	
+
 	public String encrypt(String ocard) {
 		return encrypt(sourceKey, iv, ocard);
 	}
@@ -71,36 +77,44 @@ public class ToolUtil {
 		return null;
 	}
 
+	public String getDomain() {
+		return domain;
+	}
+	
+	public String getCustomerIp() {
+		return customerIp;
+	}
+
 	private String base64Decode(String encodedString) {
 		byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
 		return new String(decodedBytes);
 	}
-	
+
 	public String maskSubstring(String input, int startIndex, int endIndex) {
-		if(StringUtils.isBlank(input)) {
+		if (StringUtils.isBlank(input)) {
 			return "";
 		}
-		
-        // 確保startIndex和endIndex在有效範圍內
-        if (startIndex < 0) {
-            startIndex = 0;
-        }
-        if (endIndex > input.length()) {
-            endIndex = input.length();
-        }
 
-        // 使用StringBuilder替換需要解碼的部分
-        StringBuilder unmaskedStringBuilder = new StringBuilder(input);
-        unmaskedStringBuilder.replace(startIndex, endIndex, generateStars(endIndex - startIndex));
+		// 確保startIndex和endIndex在有效範圍內
+		if (startIndex < 0) {
+			startIndex = 0;
+		}
+		if (endIndex > input.length()) {
+			endIndex = input.length();
+		}
 
-        return unmaskedStringBuilder.toString();
-    }
+		// 使用StringBuilder替換需要解碼的部分
+		StringBuilder unmaskedStringBuilder = new StringBuilder(input);
+		unmaskedStringBuilder.replace(startIndex, endIndex, generateStars(endIndex - startIndex));
 
-    private String generateStars(int count) {
-        StringBuilder stars = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            stars.append('*');
-        }
-        return stars.toString();
-    }
+		return unmaskedStringBuilder.toString();
+	}
+
+	private String generateStars(int count) {
+		StringBuilder stars = new StringBuilder();
+		for (int i = 0; i < count; i++) {
+			stars.append('*');
+		}
+		return stars.toString();
+	}
 }
