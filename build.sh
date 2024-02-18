@@ -22,7 +22,7 @@ touch ${SINOPAC_LOG_PATH}/info.log
 cd ${SINOPAC_PATH}/target
 
 sudo nohup java \
-	 -jar api.jar \
+	 -jar api.jar --spring.profiles.active=dev \
 	 > /dev/null 2>&1 &
 	 
 #tail -f ${SINOPAC_LOG_PATH}/info.log
