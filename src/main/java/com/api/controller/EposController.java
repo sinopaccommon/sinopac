@@ -30,5 +30,14 @@ public class EposController {
 		return ResponseEntity.ok(eposService.query(ocard));
 	}
 	
-
+	@PostMapping("/capture")
+	public ResponseEntity<String> capture(String ocard) {
+		return ResponseEntity.ok(eposService.capture(ocard));
+	}
+	
+	@PostMapping("/refund")
+	public ResponseEntity<String> refund(String ocard) {
+		return ResponseEntity.ok(eposService.refund(ocard));
+	}
+	
 }
