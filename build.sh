@@ -1,4 +1,4 @@
-IP=ip addr |grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|grep -v 172| cut -d'/' -f 1
+IP=$(ip addr |grep inet|grep -v 127.0.0.1|grep -v inet6|awk '{print $2}'|grep -v 172| cut -d'/' -f 1)
 SINOPAC_ROOT=/usr/AP
 SINOPAC_PATH=${SINOPAC_ROOT}/sinopac
 SINOPAC_LOG_PATH=${SINOPAC_PATH}/logs
